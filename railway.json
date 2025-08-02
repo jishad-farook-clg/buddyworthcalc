@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "nixpacks",
+    "config": {
+      "startCommand": "python manage.py migrate && gunicorn buddyworthcalc.wsgi:application",
+      "installCommand": "pip install -r requirements.txt"
+    }
+  }
+}
