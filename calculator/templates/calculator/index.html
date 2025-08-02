@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buddy's Worthness Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="cyberpunk-theme">
+    <div class="container">
+        <header>
+            <h1>🦾 <span class="glitch" data-text="BUDDY'S WORTHNESS CALCULATOR">BUDDY'S WORTHNESS CALCULATOR</span></h1>
+            <p class="subtitle">AI-Powered Black Market Valuation System</p>
+        </header>
+
+        <div class="upload-box" id="uploadBox">
+            <form method="post" enctype="multipart/form-data" id="uploadForm">
+                {% csrf_token %}
+                <input type="file" id="imageUpload" name="image" accept="image/*" required hidden>
+                <label for="imageUpload" class="upload-label">
+                    <div class="upload-icon">📁</div>
+                    <span>UPLOAD YOUR IMAGE</span>
+                </label>
+                <div id="imagePreview" class="image-preview"></div>
+                
+                <div id="loadingIndicator" class="loading-indicator">
+                    <div class="scan-animation"></div>
+                    ANALYZING BIOMETRICS...
+                </div>
+                
+                <div class="error-message" id="errorMessage"></div>
+                
+                <button type="submit" class="cyber-button" id="calculateBtn">
+                    <span class="glitch" data-text="CALCULATE">CALCULATE</span>
+                    <span class="scanline"></span>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Results Container -->
+        <div class="result-container" id="resultContainer">
+            <h3 class="result-header">BLACK MARKET VALUATION REPORT</h3>
+            <div id="resultsContent" class="results-content">
+                <!-- Results will be inserted here by JavaScript -->
+            </div>
+            <p class="disclaimer">
+                * Prices based on current underground market rates<br>
+                * This is a fictional simulation - no actual organs were appraised
+            </p>
+        </div>
+    </div>
+
+    <script src="{% static 'js/scanner.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadForm = document.getElementById('uploadForm');
+            const imageUpload = document.getElementById('imageUpload');
+            const imagePreview = document.getElementById('imagePreview');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            // Handle image preview
+            imageUpload.addEventListener('change', function(e) {
+                imagePreview.innerHTML = '';
+                errorMessage.style.display = 'none';
+                
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.classList.add('preview-image');
+                        imagePreview.appendChild(img);
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Handle form submission
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                loadingIndicator.style.display = 'block';
+                errorMessage.style.display = 'none';
+                resultContainer.style.display = 'none';
+                
+                // Prepare form data
+                const formData = new FormData(this);
+                
+                // Submit via AJAX
+                fetch('', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // Clear previous results
+                    resultsContent.innerHTML = '';
+                    
+                    // Display new results
+                    if (data.prices && Object.keys(data.prices).length > 0) {
+                        Object.entries(data.prices).forEach(([organ, price]) => {
+                            const row = document.createElement('div');
+                            row.className = 'organ-row';
+                            row.innerHTML = `
+                                <span class="organ-name">${organ.toUpperCase()}</span>
+                                <span class="organ-value">${price}</span>
+                            `;
+                            resultsContent.appendChild(row);
+                        });
+                        
+                        // Show result container
+                        resultContainer.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = `ERROR: ${error.message}`;
+                    errorMessage.style.display = 'block';
+                })
+                .finally(() => {
+                    loadingIndicator.style.display = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

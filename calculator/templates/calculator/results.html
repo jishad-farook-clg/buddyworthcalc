@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Valuation Complete</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="cyberpunk-theme">
+    <div class="container">
+        <header>
+            <h1>🔍 <span class="glitch" data-text="AI VALUATION REPORT">AI VALUATION REPORT</span></h1>
+            <p class="subtitle">Black Market Pricing Matrix</p>
+        </header>
+
+        <div class="scan-container">
+            <div class="scanned-image">
+                <img src="{{ image_url }}" alt="Scanned Subject" class="pulse">
+                <div class="scan-overlay"></div>
+            </div>
+
+            <div class="results-grid">
+                {% for part, price in prices.items %}
+                <div class="cyber-card">
+                    <div class="organ-name">{{ part|upper }}</div>
+                    <div class="organ-price">{{ price }}</div>
+                    <div class="organ-desc">{{ get_random_description(part) }}</div>
+                    <div class="barcode"></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <p>⚠️ WARNING: This valuation is for entertainment purposes only.</p>
+            <p>NEVER attempt to sell your organs. The Syndicate is watching.</p>
+        </div>
+    </div>
+</body>
+</html>

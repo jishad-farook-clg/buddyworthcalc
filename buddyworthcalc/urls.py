@@ -15,8 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from calculator.views import calculate_price
+from calculator.views import calculate_price,index
 
 urlpatterns = [
     path('calculate-price/', calculate_price),
+    path('', index, name='index'),
+
 ]
